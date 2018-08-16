@@ -7,6 +7,7 @@ import (
 	"fmt"
 		"./token"
 	"strings"
+	"./translater"
 )
 
 func main() {
@@ -23,8 +24,33 @@ func main() {
 	parseCode("def showMessge(msg) toy_print(msg)")
 	parseCode("showMessge('test')")
 
+	fmt.Println()
+	fmt.Println()
+	fmt.Println("*********RUN CODE**********")
 
-	println("DONE")
+	runCode("def showMessge(msg) toy_print(msg)")
+	runCode("showMessge('test')")
+	dumpLLVMIR()
+
+
+	fmt.Println("DONE")
+}
+func dumpLLVMIR() {
+	translater.Dump()
+}
+func runCode(code string) {
+	s:= strings.NewReader(code)
+	token.CommandReader = bufio.NewReader(s)
+
+	fmt.Println("CODE 2 RUN>"+code)
+
+	token.Reset()
+
+	curToken := token.GetToken()
+
+	node := ast.Parse(curToken)
+
+	translater.RunAST(node)
 }
 
 func parseCode(code string) {

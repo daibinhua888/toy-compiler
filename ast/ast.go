@@ -1,7 +1,10 @@
 // ast project ast.go
 package ast
 
-import "strconv"
+import (
+	"strconv"
+	"strings"
+)
 
 type ASTNode struct {
 	NodeType     string
@@ -89,4 +92,72 @@ func (self *ASTNode) ToString() string {
 	}
 
 	return str
+}
+func (self *ASTNode) GenerateLLVMCode4DefineVariables() string {
+
+	defineStringTemplate:=`@.{variableName} = private unnamed_addr constant [{stringLength} x i8] c"{stringContent}\0A\00"`
+
+	codes:=""
+	if self.FunctionCall!=nil{
+		if self.FunctionCall.parameters!=nil{
+			for i:=0;i<len(self.FunctionCall.parameters);i++{
+				p:=self.FunctionCall.parameters[i]
+				if p.parameterType=="string"{
+
+					curCodeLine:=strings.Replace(defineStringTemplate, "{variableName}", strings.Trim(p.identifier, "'"), -1)
+					length:=len(strings.Trim(p.identifier, "'"))+2
+					curCodeLine=strings.Replace(curCodeLine, "{stringLength}", strconv.Itoa(length), -1)
+					curCodeLine=strings.Replace(curCodeLine, "{stringContent}", strings.Trim(p.identifier, "'"), -1)
+
+					codes+=curCodeLine+"\r\n"
+				}
+			}
+		}
+	}
+
+
+	return codes
+}
+func (self *ASTNode) GenerateLLVMCode4DefineFunction() string{
+
+	if self.FunctionSignature!=nil{
+		defineFunctionTemplate:=`
+define void @{functionName}(){
+;
+	{functionBody}
+	ret void
+}
+`
+		code:=strings.Replace(defineFunctionTemplate, "{functionName}", self.FunctionSignature.Identifier, -1)
+
+		code=strings.Replace(code, "{functionBody}", generateBody(self.FunctionBody), -1)
+
+		return code
+	}
+
+	return ""
+}
+func generateBody(node *ASTNode) string {
+
+	if node.FunctionCall!=nil{
+		if node.FunctionCall.Identifier=="toy_print"{
+			//puts函数调用
+			toy_print_template:=`
+	%cast210 = getelementptr [6 x i8], [6 x i8]* @.test, i64 0, i64 0
+	call i32 @puts(i8* %cast210)
+`
+			print_code:=toy_print_template
+			return print_code
+		}
+	}
+
+	return ""
+}
+func (self *ASTNode) GenerateLLVMCode4InMain() string{
+
+	if self.FunctionCall!=nil{
+		return "	call void @"+self.FunctionCall.Identifier+"()"
+	}
+
+	return ""
 }
