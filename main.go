@@ -20,6 +20,9 @@ func main() {
 	parseCode("p1(a,b)+p2(a,b)")
 	parseCode("1+(2+3)")
 	parseCode("def test(p1,p2) p1(a,b)+p2(a,b)")
+	parseCode("def showMessge(msg) toy_print(msg)")
+	parseCode("showMessge('test')")
+
 
 	println("DONE")
 }

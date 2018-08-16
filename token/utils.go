@@ -14,8 +14,13 @@ func IsNumeric(char string) bool {
 	return r
 }
 
-func IsAlphaOrNumeric(char string) bool {
-	return IsAlpha(char) || IsNumeric(char)
+func IsSpecialChar(char string) bool {
+	r, _ := regexp.MatchString("_", char)
+	return r
+}
+
+func IsAlphaOrNumericOrSpecialChar(char string) bool {
+	return IsAlpha(char) || IsNumeric(char) || IsSpecialChar(char)
 }
 
 func IsSpace(char string) bool {

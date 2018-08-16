@@ -17,6 +17,8 @@ type ASTNode struct {
 
 type Parameter struct {
 	identifier string
+	stringText string
+	parameterType string
 }
 
 type FunctionSignature struct {

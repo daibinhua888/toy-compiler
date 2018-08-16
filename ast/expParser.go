@@ -35,6 +35,7 @@ func parseIdentifierExpr() *ASTNode  {
 	plist:=list.New()
 	for{
 		token.GetToken()
+		//fmt.Println(token.CurrentToken)
 		if token.CurrentToken==token.TOK_RB{		//碰到右括号
 			break
 		}
@@ -42,20 +43,23 @@ func parseIdentifierExpr() *ASTNode  {
 			token.GetToken()
 		}
 
-		if token.CurrentToken!=token.TOK_identifier{
-			panic("无法找到参数")
+		if(token.CurrentToken==token.TOK_identifier){
+			tempParameter:=new(Parameter)
+			tempParameter.identifier=token.Identifier_value
+			tempParameter.parameterType="identifier"
+			plist.PushBack(tempParameter)
+		} else if(token.CurrentToken==token.TOK_STRING){
+			tempParameter:=new(Parameter)
+			tempParameter.identifier=token.String_value
+			tempParameter.parameterType="string"
+			plist.PushBack(tempParameter)
 		}
-		plist.PushBack(token.Identifier_value)
 	}
 
 	pArray:=make([]Parameter, plist.Len())
 	index:=0
 	for v := plist.Front(); v != nil; v = v.Next() {
-		p:=new(Parameter)
-		p.identifier=v.Value.(string)
-
-		pArray[index]= *p
-
+		pArray[index]=* v.Value.(* Parameter)
 		index++
 	}
 	callSig:=new(FunctionCall)

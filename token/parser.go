@@ -22,11 +22,13 @@ const (
 	TOK_MINUS=-12
 	TOK_MULTIPLY=-13
 	TOK_DIV=-14
+	TOK_STRING=-15
 )
 
 var CommandReader *bufio.Reader = nil
 
 var Identifier_value string
+var String_value string
 var Numeric_value float64
 
 func getChar() (string, byte) {
@@ -49,7 +51,7 @@ func getToken() int {
 
 		for {
 			lastChar, lastCharByte = getChar()
-			if IsAlphaOrNumeric(lastChar) {
+			if IsAlphaOrNumericOrSpecialChar(lastChar) {
 				Identifier_value += lastChar
 			} else {
 				break
@@ -76,6 +78,20 @@ func getToken() int {
 
 		Numeric_value, _ = strconv.ParseFloat(tmpNumber, 32)
 		return TOK_number
+	}
+	if lastChar=="'"{
+		String_value = lastChar
+
+		for {
+			lastChar, lastCharByte = getChar()
+			String_value += lastChar
+			if lastChar=="'" {
+				break
+			}
+		}
+
+		lastChar, lastCharByte = getChar()
+		return TOK_STRING
 	}
 	if lastChar=="("{
 		lastChar, lastCharByte = getChar()
