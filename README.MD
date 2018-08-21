@@ -62,8 +62,8 @@ define i32 @main(){
 }
 ```
 
-#llc
+#lli
 ```
->>llc code.ll
+>>lli code.ll
 >>test
 ```
